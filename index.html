@@ -1108,6 +1108,13 @@ document.getElementById("calcShipping").addEventListener("click", async ()=>{
   btn.disabled = true; btn.textContent = "Getting live rates...";
   orderStatus.textContent = "";
 
+  // Reset any previous quote/selection immediately — never leave a stale
+  // summary on screen while we fetch (or fail to fetch) a new one.
+  selectedShipping = null;
+  document.getElementById("shippingBlock").style.display = "none";
+  document.getElementById("shippingOptions").innerHTML = "";
+  document.getElementById("orderSummary").style.display = "none";
+
   try{
     const res = await fetch(`${API_BASE_URL}/api/rates`, {
       method: "POST",
@@ -1130,10 +1137,8 @@ document.getElementById("calcShipping").addEventListener("click", async ()=>{
     if(!data.rates || data.rates.length === 0){
       orderStatus.style.color = "var(--gold)";
       orderStatus.textContent = data.warning || "No live carrier rates available for this address yet.";
-      document.getElementById("shippingBlock").style.display = "none";
       return;
     }
-    selectedShipping = null;
     document.getElementById("shippingBlock").style.display = "block";
     renderShippingOptions(data.rates);
     updateSummary();
