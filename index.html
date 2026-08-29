@@ -130,6 +130,27 @@
     border:none;
     cursor:pointer;
   }
+  .lang-toggle{
+    display:inline-flex;
+    border:1px solid var(--line);
+    border-radius:999px;
+    overflow:hidden;
+  }
+  .lang-btn{
+    padding:9px 16px;
+    font-size:14px;
+    font-family:'Work Sans',sans-serif;
+    background:transparent;
+    color:var(--cream-dim);
+    border:none;
+    cursor:pointer;
+  }
+  .lang-btn.active{
+    background:var(--gold);
+    color:#241a06;
+    font-weight:600;
+  }
+  .lang-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
 
   /* ---------- shop shell ---------- */
   .shell{
@@ -464,6 +485,12 @@
   }
   textarea{resize:vertical;min-height:60px;}
   .field-error{color:var(--red);font-size:12px;margin-top:4px;display:none;}
+  .addr-extra-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .addr-extra-row label{margin-top:14px;}
   .modal-actions{
     display:flex;gap:10px;margin-top:22px;
   }
@@ -536,18 +563,21 @@
 <body>
 
 <header>
-  <div class="eyebrow">C/ Industria 124 · Near Sagrada Família · Barcelona 08025</div>
+  <div class="eyebrow" id="eyebrowText">C/ Industria 124 · Near Sagrada Família · Barcelona 08025</div>
   <h1 class="hero-title">Nepali Products Barcelona
     <span class="np">बुद्धभुमि प्रा.ली. — नेपाली खाद्यान्न पसल</span>
   </h1>
-  <p class="hero-sub">Nepali flours, pickles (achar), spices, lentils, noodles and tea brought directly from Nepal. Place your order and we'll deliver it to your door, anywhere in Barcelona or across Europe.</p>
+  <p class="hero-sub" id="heroSub">Nepali flours, pickles (achar), spices, lentils, noodles and tea brought directly from Nepal. Place your order and we'll deliver it to your door, anywhere in Barcelona or across Europe.</p>
   <div class="contact-row">
-    <span class="pill">Shop: <b>+34 931 842 855</b></span>
-    <span class="pill">WhatsApp: <b>+34 632 787 437</b></span>
-    <a class="btn-wa" href="https://wa.me/34632787437?text=Hi%2C%20I%27d%20like%20to%20ask%20about%20your%20products" target="_blank" rel="noopener">
-      <i aria-hidden="true">&#9990;</i> Message us on WhatsApp
+    <span class="pill"><span id="shopLabel">Shop:</span> <b>+34 931 842 855</b></span>
+    <span class="pill"><span id="whatsappLabel">WhatsApp:</span> <b>+34 632 787 437</b></span>
+    <a class="btn-wa" id="waBtn" href="https://wa.me/34632787437?text=Hi%2C%20I%27d%20like%20to%20ask%20about%20your%20products" target="_blank" rel="noopener">
+      <i aria-hidden="true">&#9990;</i> <span id="waBtnText">Message us on WhatsApp</span>
     </a>
-    <a class="pill" href="tienda-nepali-barcelona.html">ES 🇪🇸</a>
+    <div class="lang-toggle" role="group" aria-label="Language / भाषा">
+      <button class="lang-btn active" id="langEnBtn" data-lang="en" type="button">EN</button>
+      <button class="lang-btn" id="langNpBtn" data-lang="np" type="button">NP</button>
+    </div>
   </div>
 </header>
 
@@ -556,7 +586,7 @@
 </div>
 
 <div class="shell">
-  <h2 class="sr-only">Catalogue of Nepali products with shopping cart and live carrier checkout</h2>
+  <h2 class="sr-only" id="srHeading">Catalogue of Nepali products with shopping cart and live carrier checkout</h2>
 
   <div class="toolbar">
     <div class="toolbar-inner">
@@ -567,61 +597,72 @@
 
   <div id="catalog"></div>
 
-  <div class="note-strip">
+  <div class="note-strip" id="noteStrip">
     <b>Delivery:</b> we deliver to Barcelona and to other cities across Europe and worldwide. When you confirm your order you'll get real-time rates from our carriers (UPS, DHL, DHL eCommerce, FedEx) based on your address, choose one, and place your order directly — no WhatsApp needed. We'll follow up by email to arrange payment.
   </div>
 </div>
 
-<footer>Buddhabhumi Pvt. Li. — Barcelona, Spain</footer>
+<footer id="footerText">Buddhabhumi Pvt. Li. — Barcelona, Spain</footer>
 
 <button class="cart-fab" id="cartFab" aria-label="Open cart">
-  <i aria-hidden="true">&#128722;</i> Cart <span class="count" id="cartCount">0</span> · <span id="cartTotalMini">€0.00</span>
+  <i aria-hidden="true">&#128722;</i> <span id="cartFabLabel">Cart</span> <span class="count" id="cartCount">0</span> · <span id="cartTotalMini">€0.00</span>
 </button>
 
 <div class="overlay" id="overlay"></div>
 
 <aside class="drawer" id="drawer" aria-label="Shopping cart">
   <div class="drawer-head">
-    <h3>Your order</h3>
+    <h3 id="drawerTitle">Your order</h3>
     <button class="drawer-close" id="drawerClose" aria-label="Close cart">&times;</button>
   </div>
   <div class="drawer-body" id="drawerBody"></div>
   <div class="drawer-foot">
-    <div class="total-row"><span>Total</span><b id="drawerTotal">€0.00</b></div>
+    <div class="total-row"><span id="drawerTotalLabel">Total</span><b id="drawerTotal">€0.00</b></div>
     <button class="checkout-btn" id="openCheckout" disabled>Continue with order</button>
   </div>
 </aside>
 
 <div class="modal-wrap" id="modalWrap">
   <div class="modal">
-    <h2>Confirm order</h2>
-    <p class="hint">Fill in your details, get live carrier rates, and confirm — your order goes straight to us, no WhatsApp step required.</p>
+    <h2 id="modalTitle">Confirm order</h2>
+    <p class="hint" id="modalHint">Fill in your details, get live carrier rates, and confirm — your order goes straight to us, no WhatsApp step required.</p>
 
-    <label for="fName">Full name</label>
+    <label for="fName" id="labelName">Full name</label>
     <input type="text" id="fName" autocomplete="name">
     <div class="field-error" id="errName">Please enter your name.</div>
 
-    <label for="fPhone">Phone</label>
+    <label for="fPhone" id="labelPhone">Phone</label>
     <input type="tel" id="fPhone" autocomplete="tel">
     <div class="field-error" id="errPhone">Please enter a contact phone number.</div>
 
-    <label for="fEmail">Email (for your order confirmation)</label>
+    <label for="fEmail" id="labelEmail">Email (for your order confirmation)</label>
     <input type="text" id="fEmail" autocomplete="email">
     <div class="field-error" id="errEmail">Please enter a valid email.</div>
 
-    <label for="fAddress">Delivery address</label>
+    <label for="fAddress" id="labelAddress">Delivery address</label>
     <input type="text" id="fAddress" autocomplete="street-address">
     <div class="field-error" id="errAddress">Please enter the delivery address.</div>
 
-    <label for="fPostal">Postal code</label>
+    <div class="addr-extra-row">
+      <div>
+        <label for="fFloor" id="labelFloor">Floor</label>
+        <input type="text" id="fFloor" autocomplete="address-line2" placeholder="e.g. 2n">
+      </div>
+      <div>
+        <label for="fDoor" id="labelDoor">Door</label>
+        <input type="text" id="fDoor" autocomplete="address-line2" placeholder="e.g. 3a">
+      </div>
+    </div>
+
+    <label for="fPostal" id="labelPostal">Postal code</label>
     <input type="text" id="fPostal" autocomplete="postal-code" inputmode="numeric">
     <div class="field-error" id="errPostal">Please enter the postal code.</div>
 
-    <label for="fCity">City</label>
+    <label for="fCity" id="labelCity">City</label>
     <input type="text" id="fCity" autocomplete="address-level2">
     <div class="field-error" id="errCity">Please enter the city.</div>
 
-    <label for="fCountry">Country</label>
+    <label for="fCountry" id="labelCountry">Country</label>
     <select id="fCountry">
       <option value="ES" selected>Spain</option>
       <option value="FR">France</option>
@@ -653,19 +694,19 @@
     <button class="btn-shipping" id="calcShipping">Get shipping rates</button>
 
     <div id="shippingBlock" style="display:none;">
-      <label style="margin-top:20px;">Choose a carrier</label>
+      <label style="margin-top:20px;" id="labelCarrier">Choose a carrier</label>
       <div id="shippingOptions"></div>
       <div class="field-error" id="errShipping">Please choose a shipping option.</div>
-      <p class="ship-note">Live rates from your connected carriers (UPS, DHL, DHL eCommerce, FedEx...) via Shippo.</p>
+      <p class="ship-note" id="shipNote">Live rates from your connected carriers (UPS, DHL, DHL eCommerce, FedEx...) via Shippo.</p>
     </div>
 
-    <label for="fNotes">Notes (optional)</label>
+    <label for="fNotes" id="labelNotes">Notes (optional)</label>
     <textarea id="fNotes" placeholder="Delivery preferences, timing, etc."></textarea>
 
     <div class="order-summary" id="orderSummary" style="display:none;">
-      <div class="total-row"><span>Products</span><span id="sumProducts">€0.00</span></div>
-      <div class="total-row"><span>Shipping</span><span id="sumShipping">—</span></div>
-      <div class="total-row"><span>Total</span><b id="sumTotal">€0.00</b></div>
+      <div class="total-row"><span id="sumProductsLabel">Products</span><span id="sumProducts">€0.00</span></div>
+      <div class="total-row"><span id="sumShippingLabel">Shipping</span><span id="sumShipping">—</span></div>
+      <div class="total-row"><span id="sumTotalLabel">Total</span><b id="sumTotal">€0.00</b></div>
     </div>
 
     <div class="modal-actions">
@@ -679,6 +720,147 @@
 <script>
 // >>> Point this at your deployed backend (see /nepali-shop-backend/README.md) <<<
 const API_BASE_URL = "https://nepali-shop-backend.onrender.com";
+
+let lang = "en"; // "en" or "np" — toggled by the EN/NP buttons, no reload
+
+const I18N = {
+  en: {
+    eyebrowText: "C/ Industria 124 · Near Sagrada Família · Barcelona 08025",
+    heroSub: "Nepali flours, pickles (achar), spices, lentils, noodles and tea brought directly from Nepal. Place your order and we'll deliver it to your door, anywhere in Barcelona or across Europe.",
+    shopLabel: "Shop:",
+    whatsappLabel: "WhatsApp:",
+    waBtnText: "Message us on WhatsApp",
+    searchPlaceholder: "Search a product (e.g. achar, chiura, masala...)",
+    catAll: "All",
+    photoCredit: "Illustrative photos, not the exact product — Wikimedia Commons, CC licenses / public domain (credit shown on hover over each photo).",
+    packLabel: "Pack:",
+    addBtn: "Add",
+    removeUnitAria: "Remove one unit",
+    addUnitAria: "Add one unit",
+    noMatch: "No products match your search.",
+    noteStrip: "<b>Delivery:</b> we deliver to Barcelona and to other cities across Europe and worldwide. When you confirm your order you'll get real-time rates from our carriers (UPS, DHL, DHL eCommerce, FedEx) based on your address, choose one, and place your order directly — no WhatsApp needed. We'll follow up by email to arrange payment.",
+    footerText: "Buddhabhumi Pvt. Li. — Barcelona, Spain",
+    cartFabLabel: "Cart",
+    openCartAria: "Open cart",
+    closeCartAria: "Close cart",
+    shoppingCartAria: "Shopping cart",
+    drawerTitle: "Your order",
+    drawerTotalLabel: "Total",
+    continueOrder: "Continue with order",
+    emptyCart: "Your cart is empty. Add products from the catalogue.",
+    removeBtn: "Remove",
+    modalTitle: "Confirm order",
+    modalHint: "Fill in your details, get live carrier rates, and confirm — your order goes straight to us, no WhatsApp step required.",
+    labelName: "Full name",
+    errName: "Please enter your name.",
+    labelPhone: "Phone",
+    errPhone: "Please enter a contact phone number.",
+    labelEmail: "Email (for your order confirmation)",
+    errEmail: "Please enter a valid email.",
+    labelAddress: "Delivery address",
+    errAddress: "Please enter the delivery address.",
+    labelFloor: "Floor",
+    labelDoor: "Door",
+    labelPostal: "Postal code",
+    errPostal: "Please enter the postal code.",
+    labelCity: "City",
+    errCity: "Please enter the city.",
+    labelCountry: "Country",
+    errCountry: "Please choose the country.",
+    otherCountryMsg: "For destinations outside this list, please message us on WhatsApp so we can quote it manually.",
+    getRatesBtn: "Get shipping rates",
+    gettingRates: "Getting live rates...",
+    labelCarrier: "Choose a carrier",
+    errShipping: "Please choose a shipping option.",
+    shipNote: "Live rates from your connected carriers (UPS, DHL, DHL eCommerce, FedEx...) via Shippo.",
+    labelNotes: "Notes (optional)",
+    notesPlaceholder: "Delivery preferences, timing, etc.",
+    sumProductsLabel: "Products",
+    sumShippingLabel: "Shipping",
+    sumTotalLabel: "Total",
+    cancelBtn: "Cancel",
+    confirmBtn: "Confirm order",
+    placingOrder: "Placing order...",
+    noRatesWarning: "No live carrier rates available for this address yet.",
+    rateFetchErrorDefault: "Could not get shipping rates.",
+    shippingBackendErrorPrefix: "Couldn't reach the shipping backend: ",
+    orderErrorDefault: "Could not place the order.",
+    orderErrorPrefix: "Couldn't place the order: ",
+    orderSuccess: (id) => `Order placed! Your order number is ${id}. We'll email you to confirm payment.`,
+    etaVaries: "ETA varies",
+    daysSuffix: " days",
+    productWord: (n) => n===1 ? "product" : "products"
+  },
+  np: {
+    eyebrowText: "C/ Industria 124 · Sagrada Família नजिक · Barcelona 08025",
+    heroSub: "नेपालबाट सिधै ल्याइएको पिठो, अचार, मसला, दाल, चाउचाउ र चिया। आफ्नो अर्डर गर्नुहोस्, हामी बार्सिलोना वा युरोपभर तपाईंको ढोकासम्म पुर्‍याउनेछौं।",
+    shopLabel: "पसल:",
+    whatsappLabel: "ह्वाट्सएप:",
+    waBtnText: "ह्वाट्सएपमा सन्देश पठाउनुहोस्",
+    searchPlaceholder: "उत्पादन खोज्नुहोस् (जस्तै achar, chiura, masala...)",
+    catAll: "सबै",
+    photoCredit: "उदाहरणका लागि फोटो, ठ्याक्कै उही उत्पादन नभएको हुन सक्छ — Wikimedia Commons, CC लाइसेन्स / सार्वजनिक डोमेन (क्रेडिट प्रत्येक फोटोमा होभर गर्दा देखिन्छ)।",
+    packLabel: "प्याक:",
+    addBtn: "थप्नुहोस्",
+    removeUnitAria: "एक थान हटाउनुहोस्",
+    addUnitAria: "एक थान थप्नुहोस्",
+    noMatch: "तपाईंको खोजसँग मिल्ने उत्पादन फेला परेन।",
+    noteStrip: "<b>डेलिभरी:</b> हामी बार्सिलोना र युरोपका अन्य शहरहरू साथै विश्वभर डेलिभरी गर्छौं। अर्डर पुष्टि गर्दा तपाईंले हाम्रा ढुवानी कम्पनीहरू (UPS, DHL, DHL eCommerce, FedEx) बाट तपाईंको ठेगानाअनुसार वास्तविक-समयको दर पाउनुहुनेछ, एउटा छान्नुहोस्, र सिधै अर्डर राख्नुहोस् — ह्वाट्सएप चाहिँदैन। भुक्तानी मिलाउन हामी पछि इमेल गर्नेछौं।",
+    footerText: "बुद्धभूमि प्रा.लि. — बार्सिलोना, स्पेन",
+    cartFabLabel: "कार्ट",
+    openCartAria: "कार्ट खोल्नुहोस्",
+    closeCartAria: "कार्ट बन्द गर्नुहोस्",
+    shoppingCartAria: "किनमेल कार्ट",
+    drawerTitle: "तपाईंको अर्डर",
+    drawerTotalLabel: "जम्मा",
+    continueOrder: "अर्डर अगाडि बढाउनुहोस्",
+    emptyCart: "तपाईंको कार्ट खाली छ। सूचीबाट उत्पादनहरू थप्नुहोस्।",
+    removeBtn: "हटाउनुहोस्",
+    modalTitle: "अर्डर पुष्टि गर्नुहोस्",
+    modalHint: "आफ्नो विवरण भर्नुहोस्, ढुवानी दर हेर्नुहोस्, र पुष्टि गर्नुहोस् — तपाईंको अर्डर सिधै हामीलाई जान्छ, ह्वाट्सएप आवश्यक पर्दैन।",
+    labelName: "पूरा नाम",
+    errName: "कृपया आफ्नो नाम लेख्नुहोस्।",
+    labelPhone: "फोन",
+    errPhone: "कृपया सम्पर्क फोन नम्बर लेख्नुहोस्।",
+    labelEmail: "इमेल (अर्डर पुष्टिको लागि)",
+    errEmail: "कृपया मान्य इमेल लेख्नुहोस्।",
+    labelAddress: "डेलिभरी ठेगाना",
+    errAddress: "कृपया डेलिभरी ठेगाना लेख्नुहोस्।",
+    labelFloor: "तला",
+    labelDoor: "ढोका",
+    labelPostal: "हुलाक कोड",
+    errPostal: "कृपया हुलाक कोड लेख्नुहोस्।",
+    labelCity: "शहर",
+    errCity: "कृपया शहर लेख्नुहोस्।",
+    labelCountry: "देश",
+    errCountry: "कृपया देश छान्नुहोस्।",
+    otherCountryMsg: "यो सूचीभन्दा बाहिरका गन्तव्यका लागि, कृपया हामीलाई ह्वाट्सएपमा सन्देश पठाउनुहोस् ताकि हामी म्यानुअल रूपमा दर दिन सकौं।",
+    getRatesBtn: "ढुवानी दर हेर्नुहोस्",
+    gettingRates: "दर ल्याउँदै...",
+    labelCarrier: "ढुवानी कम्पनी छान्नुहोस्",
+    errShipping: "कृपया ढुवानी विकल्प छान्नुहोस्।",
+    shipNote: "Shippo मार्फत तपाईंका जोडिएका ढुवानी कम्पनीहरू (UPS, DHL, DHL eCommerce, FedEx...) बाट प्रत्यक्ष दर।",
+    labelNotes: "टिप्पणी (वैकल्पिक)",
+    notesPlaceholder: "डेलिभरी प्राथमिकता, समय, आदि।",
+    sumProductsLabel: "उत्पादनहरू",
+    sumShippingLabel: "ढुवानी",
+    sumTotalLabel: "जम्मा",
+    cancelBtn: "रद्द गर्नुहोस्",
+    confirmBtn: "अर्डर पुष्टि गर्नुहोस्",
+    placingOrder: "अर्डर पठाउँदै...",
+    noRatesWarning: "यो ठेगानाको लागि हाल ढुवानी दर उपलब्ध छैन।",
+    rateFetchErrorDefault: "ढुवानी दर प्राप्त गर्न सकिएन।",
+    shippingBackendErrorPrefix: "ढुवानी सर्भरसँग जोड्न सकिएन: ",
+    orderErrorDefault: "अर्डर राख्न सकिएन।",
+    orderErrorPrefix: "अर्डर राख्न सकिएन: ",
+    orderSuccess: (id) => `अर्डर राखियो! तपाईंको अर्डर नम्बर ${id} हो। भुक्तानी पुष्टि गर्न हामी तपाईंलाई इमेल गर्नेछौं।`,
+    etaVaries: "समय फरक हुन सक्छ",
+    daysSuffix: " दिन",
+    productWord: () => "उत्पादन"
+  }
+};
+
+function t(key){ return I18N[lang][key]; }
 
 const CATEGORIES = [
   {id:"pitho", es:"Flours & grains", np:"पिठो / अन्न"},
@@ -895,9 +1077,9 @@ function catLabel(id){ return CATEGORIES.find(c=>c.id===id); }
 
 function renderCatButtons(){
   const el = document.getElementById("catButtons");
-  const all = [{id:"all",es:"All",np:""}, ...CATEGORIES];
+  const all = [{id:"all",es:"All",np:"सबै"}, ...CATEGORIES];
   el.innerHTML = all.map(c =>
-    `<button class="cat-btn ${activeCat===c.id?'active':''}" data-cat="${c.id}">${c.es}</button>`
+    `<button class="cat-btn ${activeCat===c.id?'active':''}" data-cat="${c.id}">${lang==='np' ? c.np : c.es}</button>`
   ).join("");
   el.querySelectorAll(".cat-btn").forEach(btn=>{
     btn.addEventListener("click", ()=>{ activeCat = btn.dataset.cat; renderCatalog(); renderCatButtons(); });
@@ -914,9 +1096,9 @@ function renderCatalog(){
     if(items.length===0) return;
     const img = CAT_IMAGES[cat.id];
     html += `<h2 class="section-label">${cat.es} <span class="np">${cat.np}</span></h2>`;
-    html += `<div class="section-count">${items.length} product${items.length!==1?'s':''}</div>`;
+    html += `<div class="section-count">${items.length} ${t('productWord')(items.length)}</div>`;
     if(img){
-      html += `<div class="cat-credit">Illustrative photos, not the exact product — Wikimedia Commons, CC licenses / public domain (credit shown on hover over each photo).</div>`;
+      html += `<div class="cat-credit">${t('photoCredit')}</div>`;
     }
     html += `<div class="grid">`;
     items.forEach(p=>{
@@ -929,16 +1111,16 @@ function renderCatalog(){
           <div class="card-name-en">${p.en}</div>
         </div>
         <div class="card-meta"><span>${p.size}</span></div>
-        ${p.pack ? `<div class="card-pack">Pack: ${p.pack}</div>` : ""}
+        ${p.pack ? `<div class="card-pack">${t('packLabel')} ${p.pack}</div>` : ""}
         <div class="card-bottom">
           <div class="card-price">${fmt(p.price)}</div>
           ${inCart>0
             ? `<div class="qty-stepper">
-                 <button data-action="dec" data-id="${p.id}" aria-label="Remove one unit">−</button>
+                 <button data-action="dec" data-id="${p.id}" aria-label="${t('removeUnitAria')}">−</button>
                  <span>${inCart}</span>
-                 <button data-action="inc" data-id="${p.id}" aria-label="Add one unit">+</button>
+                 <button data-action="inc" data-id="${p.id}" aria-label="${t('addUnitAria')}">+</button>
                </div>`
-            : `<button class="add-btn" data-action="add" data-id="${p.id}">Add</button>`
+            : `<button class="add-btn" data-action="add" data-id="${p.id}">${t('addBtn')}</button>`
           }
         </div>
       </div>`;
@@ -946,7 +1128,7 @@ function renderCatalog(){
     html += `</div>`;
   });
   if(html===""){
-    html = `<div class="empty-msg">No products match your search.</div>`;
+    html = `<div class="empty-msg">${t('noMatch')}</div>`;
   }
   wrap.innerHTML = html;
   wrap.querySelectorAll("[data-action]").forEach(btn=>{
@@ -989,7 +1171,7 @@ function renderCart(){
   const body = document.getElementById("drawerBody");
   const lines = Object.values(cart);
   if(lines.length===0){
-    body.innerHTML = `<div class="empty-msg">Your cart is empty. Add products from the catalogue.</div>`;
+    body.innerHTML = `<div class="empty-msg">${t('emptyCart')}</div>`;
   } else {
     body.innerHTML = lines.map(l => `
       <div class="cart-line">
@@ -999,7 +1181,7 @@ function renderCart(){
         </div>
         <div class="cart-line-right">
           <div><b>${fmt(l.product.price*l.qty)}</b></div>
-          <button class="remove-link" data-id="${l.product.id}">Remove</button>
+          <button class="remove-link" data-id="${l.product.id}">${t('removeBtn')}</button>
         </div>
       </div>
     `).join("");
@@ -1057,7 +1239,7 @@ function renderShippingOptions(options){
       <input type="radio" name="shipOpt" value="${i}">
       <div>
         <div class="ship-option-name">${o.carrier} — ${o.service}</div>
-        <div class="ship-option-eta">${o.estimated_days ? o.estimated_days + " days" : "ETA varies"}</div>
+        <div class="ship-option-eta">${o.estimated_days ? o.estimated_days + t('daysSuffix') : t('etaVaries')}</div>
       </div>
       <div class="ship-option-price">${fmt(o.amount)}</div>
     </label>
@@ -1082,6 +1264,15 @@ function updateSummary(){
   document.getElementById("sumTotal").textContent = fmt(cartTotal() + shipPrice);
 }
 
+function floorDoorLine(){
+  const floor = document.getElementById("fFloor").value.trim();
+  const door = document.getElementById("fDoor").value.trim();
+  const parts = [];
+  if(floor) parts.push("Floor " + floor);
+  if(door) parts.push("Door " + door);
+  return parts.join(", ");
+}
+
 function cartItemsPayload(){
   return Object.values(cart).map(l => ({
     id: l.product.id, name: l.product.name, en: l.product.en,
@@ -1098,14 +1289,14 @@ document.getElementById("calcShipping").addEventListener("click", async ()=>{
   if(!(okAddress && okPostal && okCity) || country==="") return;
 
   if(country === "OTHER"){
-    document.getElementById("errCountry").textContent = "For destinations outside this list, please message us on WhatsApp so we can quote it manually.";
+    document.getElementById("errCountry").textContent = t("otherCountryMsg");
     document.getElementById("errCountry").style.display = "block";
     return;
   }
 
   const btn = document.getElementById("calcShipping");
   const orderStatus = document.getElementById("orderStatus");
-  btn.disabled = true; btn.textContent = "Getting live rates...";
+  btn.disabled = true; btn.textContent = t("gettingRates");
   orderStatus.textContent = "";
 
   // Reset any previous quote/selection immediately — never leave a stale
@@ -1123,6 +1314,7 @@ document.getElementById("calcShipping").addEventListener("click", async ()=>{
         address: {
           name: document.getElementById("fName").value.trim() || "Customer",
           street1: document.getElementById("fAddress").value.trim(),
+          street2: floorDoorLine(),
           city: document.getElementById("fCity").value.trim(),
           zip: document.getElementById("fPostal").value.trim(),
           country: country,
@@ -1133,10 +1325,10 @@ document.getElementById("calcShipping").addEventListener("click", async ()=>{
       })
     });
     const data = await res.json();
-    if(!res.ok) throw new Error(data.error || "Could not get shipping rates.");
+    if(!res.ok) throw new Error(data.error || t("rateFetchErrorDefault"));
     if(!data.rates || data.rates.length === 0){
       orderStatus.style.color = "var(--gold)";
-      orderStatus.textContent = data.warning || "No live carrier rates available for this address yet.";
+      orderStatus.textContent = data.warning || t("noRatesWarning");
       return;
     }
     document.getElementById("shippingBlock").style.display = "block";
@@ -1144,9 +1336,9 @@ document.getElementById("calcShipping").addEventListener("click", async ()=>{
     updateSummary();
   }catch(err){
     orderStatus.style.color = "var(--red)";
-    orderStatus.textContent = "Couldn't reach the shipping backend: " + err.message;
+    orderStatus.textContent = t("shippingBackendErrorPrefix") + err.message;
   }finally{
-    btn.disabled = false; btn.textContent = "Get shipping rates";
+    btn.disabled = false; btn.textContent = t("getRatesBtn");
   }
 });
 
@@ -1165,7 +1357,7 @@ document.getElementById("sendOrder").addEventListener("click", async ()=>{
 
   const orderStatus = document.getElementById("orderStatus");
   const sendBtn = document.getElementById("sendOrder");
-  sendBtn.disabled = true; sendBtn.textContent = "Placing order...";
+  sendBtn.disabled = true; sendBtn.textContent = t("placingOrder");
   orderStatus.textContent = "";
 
   try{
@@ -1180,6 +1372,7 @@ document.getElementById("sendOrder").addEventListener("click", async ()=>{
         },
         address: {
           street1: document.getElementById("fAddress").value.trim(),
+          street2: floorDoorLine(),
           city: document.getElementById("fCity").value.trim(),
           zip: document.getElementById("fPostal").value.trim(),
           country: document.getElementById("fCountry").value
@@ -1196,24 +1389,91 @@ document.getElementById("sendOrder").addEventListener("click", async ()=>{
       })
     });
     const data = await res.json();
-    if(!res.ok) throw new Error(data.error || "Could not place the order.");
+    if(!res.ok) throw new Error(data.error || t("orderErrorDefault"));
 
     orderStatus.style.color = "var(--green)";
-    orderStatus.textContent = `Order placed! Your order number is ${data.order_id}. We'll email you to confirm payment.`;
+    orderStatus.textContent = t("orderSuccess")(data.order_id);
     Object.keys(cart).forEach(k => delete cart[k]);
     renderCatalog(); renderCart();
     setTimeout(closeModal, 3500);
   }catch(err){
     orderStatus.style.color = "var(--red)";
-    orderStatus.textContent = "Couldn't place the order: " + err.message;
+    orderStatus.textContent = t("orderErrorPrefix") + err.message;
   }finally{
-    sendBtn.disabled = false; sendBtn.textContent = "Confirm order";
+    sendBtn.disabled = false; sendBtn.textContent = t("confirmBtn");
   }
+});
+
+function applyI18n(){
+  document.documentElement.lang = lang;
+  document.getElementById("eyebrowText").textContent = t("eyebrowText");
+  document.getElementById("heroSub").textContent = t("heroSub");
+  document.getElementById("shopLabel").textContent = t("shopLabel");
+  document.getElementById("whatsappLabel").textContent = t("whatsappLabel");
+  document.getElementById("waBtnText").textContent = t("waBtnText");
+  document.getElementById("searchInput").placeholder = t("searchPlaceholder");
+  document.getElementById("noteStrip").innerHTML = t("noteStrip");
+  document.getElementById("footerText").textContent = t("footerText");
+  document.getElementById("cartFabLabel").textContent = t("cartFabLabel");
+  document.getElementById("cartFab").setAttribute("aria-label", t("openCartAria"));
+  document.getElementById("drawerClose").setAttribute("aria-label", t("closeCartAria"));
+  document.getElementById("drawer").setAttribute("aria-label", t("shoppingCartAria"));
+  document.getElementById("drawerTitle").textContent = t("drawerTitle");
+  document.getElementById("drawerTotalLabel").textContent = t("drawerTotalLabel");
+  document.getElementById("openCheckout").textContent = t("continueOrder");
+  document.getElementById("modalTitle").textContent = t("modalTitle");
+  document.getElementById("modalHint").textContent = t("modalHint");
+  document.getElementById("labelName").textContent = t("labelName");
+  document.getElementById("errName").textContent = t("errName");
+  document.getElementById("labelPhone").textContent = t("labelPhone");
+  document.getElementById("errPhone").textContent = t("errPhone");
+  document.getElementById("labelEmail").textContent = t("labelEmail");
+  document.getElementById("errEmail").textContent = t("errEmail");
+  document.getElementById("labelAddress").textContent = t("labelAddress");
+  document.getElementById("errAddress").textContent = t("errAddress");
+  document.getElementById("labelFloor").textContent = t("labelFloor");
+  document.getElementById("labelDoor").textContent = t("labelDoor");
+  document.getElementById("labelPostal").textContent = t("labelPostal");
+  document.getElementById("errPostal").textContent = t("errPostal");
+  document.getElementById("labelCity").textContent = t("labelCity");
+  document.getElementById("errCity").textContent = t("errCity");
+  document.getElementById("labelCountry").textContent = t("labelCountry");
+  document.getElementById("errCountry").textContent = t("errCountry");
+  document.getElementById("calcShipping").textContent = t("getRatesBtn");
+  document.getElementById("labelCarrier").textContent = t("labelCarrier");
+  document.getElementById("errShipping").textContent = t("errShipping");
+  document.getElementById("shipNote").textContent = t("shipNote");
+  document.getElementById("labelNotes").textContent = t("labelNotes");
+  document.getElementById("fNotes").placeholder = t("notesPlaceholder");
+  document.getElementById("sumProductsLabel").textContent = t("sumProductsLabel");
+  document.getElementById("sumShippingLabel").textContent = t("sumShippingLabel");
+  document.getElementById("sumTotalLabel").textContent = t("sumTotalLabel");
+  document.getElementById("cancelCheckout").textContent = t("cancelBtn");
+  document.getElementById("sendOrder").textContent = t("confirmBtn");
+  renderCatButtons();
+  renderCatalog();
+  renderCart();
+}
+
+document.getElementById("langEnBtn").addEventListener("click", ()=>{
+  if(lang==="en") return;
+  lang = "en";
+  document.getElementById("langEnBtn").classList.add("active");
+  document.getElementById("langNpBtn").classList.remove("active");
+  applyI18n();
+});
+document.getElementById("langNpBtn").addEventListener("click", ()=>{
+  if(lang==="np") return;
+  lang = "np";
+  document.getElementById("langNpBtn").classList.add("active");
+  document.getElementById("langEnBtn").classList.remove("active");
+  applyI18n();
 });
 
 renderCatButtons();
 renderCatalog();
 renderCart();
+applyI18n();
 </script>
 </body>
 </html>
