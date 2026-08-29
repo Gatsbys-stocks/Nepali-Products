@@ -452,7 +452,7 @@
     color:var(--cream-dim);
     margin:14px 0 5px;
   }
-  input[type=text],input[type=tel],textarea{
+  input[type=text],input[type=tel],input[type=email],select,textarea{
     width:100%;
     background:var(--bg-panel-2);
     border:1px solid var(--line);
@@ -556,7 +556,7 @@
 </div>
 
 <div class="shell">
-  <h2 class="sr-only">Catalogue of Nepali products with shopping cart and WhatsApp ordering</h2>
+  <h2 class="sr-only">Catalogue of Nepali products with shopping cart and live carrier checkout</h2>
 
   <div class="toolbar">
     <div class="toolbar-inner">
@@ -568,7 +568,7 @@
   <div id="catalog"></div>
 
   <div class="note-strip">
-    <b>Delivery:</b> we deliver to Barcelona and to other cities across Europe and worldwide. When you confirm your order you'll be able to calculate the shipping cost based on your address and choose a carrier (DHL, Correos Express, UPS...) before sending it. Payment is currently arranged via WhatsApp.
+    <b>Delivery:</b> we deliver to Barcelona and to other cities across Europe and worldwide. When you confirm your order you'll get real-time rates from our carriers (UPS, DHL, DHL eCommerce, FedEx) based on your address, choose one, and place your order directly — no WhatsApp needed. We'll follow up by email to arrange payment.
   </div>
 </div>
 
@@ -595,15 +595,19 @@
 <div class="modal-wrap" id="modalWrap">
   <div class="modal">
     <h2>Confirm order</h2>
-    <p class="hint">Fill in your details, calculate shipping, and we'll contact you on WhatsApp to confirm the order and payment.</p>
+    <p class="hint">Fill in your details, get live carrier rates, and confirm — your order goes straight to us, no WhatsApp step required.</p>
 
     <label for="fName">Full name</label>
     <input type="text" id="fName" autocomplete="name">
     <div class="field-error" id="errName">Please enter your name.</div>
 
-    <label for="fPhone">Phone / WhatsApp</label>
+    <label for="fPhone">Phone</label>
     <input type="tel" id="fPhone" autocomplete="tel">
     <div class="field-error" id="errPhone">Please enter a contact phone number.</div>
+
+    <label for="fEmail">Email (for your order confirmation)</label>
+    <input type="text" id="fEmail" autocomplete="email">
+    <div class="field-error" id="errEmail">Please enter a valid email.</div>
 
     <label for="fAddress">Delivery address</label>
     <input type="text" id="fAddress" autocomplete="street-address">
@@ -618,16 +622,41 @@
     <div class="field-error" id="errCity">Please enter the city.</div>
 
     <label for="fCountry">Country</label>
-    <input type="text" id="fCountry" value="Spain" autocomplete="country-name">
-    <div class="field-error" id="errCountry">Please enter the country.</div>
+    <select id="fCountry">
+      <option value="ES" selected>Spain</option>
+      <option value="FR">France</option>
+      <option value="IT">Italy</option>
+      <option value="DE">Germany</option>
+      <option value="PT">Portugal</option>
+      <option value="NL">Netherlands</option>
+      <option value="BE">Belgium</option>
+      <option value="GB">United Kingdom</option>
+      <option value="IE">Ireland</option>
+      <option value="CH">Switzerland</option>
+      <option value="AT">Austria</option>
+      <option value="SE">Sweden</option>
+      <option value="NO">Norway</option>
+      <option value="DK">Denmark</option>
+      <option value="FI">Finland</option>
+      <option value="PL">Poland</option>
+      <option value="GR">Greece</option>
+      <option value="AD">Andorra</option>
+      <option value="US">United States</option>
+      <option value="CA">Canada</option>
+      <option value="AU">Australia</option>
+      <option value="NP">Nepal</option>
+      <option value="IN">India</option>
+      <option value="OTHER">Other (contact us)</option>
+    </select>
+    <div class="field-error" id="errCountry">Please choose the country.</div>
 
-    <button class="btn-shipping" id="calcShipping">Calculate shipping cost</button>
+    <button class="btn-shipping" id="calcShipping">Get shipping rates</button>
 
     <div id="shippingBlock" style="display:none;">
       <label style="margin-top:20px;">Choose a carrier</label>
       <div id="shippingOptions"></div>
       <div class="field-error" id="errShipping">Please choose a shipping option.</div>
-      <p class="ship-note">Estimated rates by zone. Once we connect the real DHL and other carrier APIs, this price will be exact and instant.</p>
+      <p class="ship-note">Live rates from your connected carriers (UPS, DHL, DHL eCommerce, FedEx...) via Shippo.</p>
     </div>
 
     <label for="fNotes">Notes (optional)</label>
@@ -641,18 +670,15 @@
 
     <div class="modal-actions">
       <button class="btn-cancel" id="cancelCheckout">Cancel</button>
-      <button class="btn-send" id="sendOrder">Send order via WhatsApp</button>
+      <button class="btn-send" id="sendOrder">Confirm order</button>
     </div>
+    <div id="orderStatus" style="margin-top:14px;font-size:13.5px;"></div>
   </div>
 </div>
 
 <script>
-const WA_NUMBER = "34632787437";
-// TODO (card payment): once you have a Stripe account + your own backend,
-// the "Send order via WhatsApp" checkout button gets replaced by a call
-// to your server to create a Stripe Checkout Session with the total
-// (products + chosen shipping) and redirect to payment. The Stripe
-// secret key must NEVER live in this file.
+// >>> Point this at your deployed backend (see /nepali-shop-backend/README.md) <<<
+const API_BASE_URL = "https://YOUR-BACKEND-URL.onrender.com";
 
 const CATEGORIES = [
   {id:"pitho", es:"Flours & grains", np:"पिठो / अन्न"},
@@ -1008,6 +1034,7 @@ function closeModal(){
   document.getElementById("shippingBlock").style.display = "none";
   document.getElementById("orderSummary").style.display = "none";
   document.getElementById("shippingOptions").innerHTML = "";
+  document.getElementById("orderStatus").textContent = "";
 }
 document.getElementById("openCheckout").addEventListener("click", ()=>{ closeDrawer(); openModal(); });
 document.getElementById("cancelCheckout").addEventListener("click", closeModal);
@@ -1020,43 +1047,8 @@ function validateField(id, errId, check){
   return ok;
 }
 
-/* ---------- shipping (placeholder — see TODO below) ---------- */
+/* ---------- shipping: live rates from the backend (Shippo) ---------- */
 let selectedShipping = null;
-
-// Very simplified zones by country/postal code, just so we can show an
-// indicative price while the real carrier API isn't connected yet.
-// Barcelona city = 08xxx.
-function shippingZone(country, postal){
-  const c = country.trim().toLowerCase();
-  const p = postal.trim();
-  if((c==="españa" || c==="spain" || c==="es") && /^08/.test(p)) return "bcn";
-  if(c==="españa" || c==="spain" || c==="es") return "es";
-  const eu = ["francia","france","italia","italy","alemania","germany","portugal","países bajos","netherlands","bélgica","belgium","reino unido","united kingdom"];
-  if(eu.includes(c)) return "eu";
-  return "intl";
-}
-
-// TODO (real shipping rates): replace this function with an actual call
-// to the DHL, UPS, Correos Express, etc. APIs (needs your own backend +
-// business account credentials with each carrier — this can't be done
-// with just HTML/JS in the browser). For now it returns fixed estimated
-// rates by zone so the customer sees a shipping price before paying.
-function getShippingOptions(zone){
-  const TABLE = {
-    bcn:  [ {carrier:"Store pickup", eta:"Today / tomorrow", price:0},
-            {carrier:"Local courier", eta:"24-48h", price:4.5},
-            {carrier:"DHL Standard", eta:"1-2 days", price:6.9} ],
-    es:   [ {carrier:"Correos Express", eta:"2-4 days", price:6.5},
-            {carrier:"DHL Standard", eta:"2-3 days", price:8.9},
-            {carrier:"DHL Express", eta:"24h", price:14.9} ],
-    eu:   [ {carrier:"DHL Standard", eta:"4-6 days", price:15.9},
-            {carrier:"DHL Express", eta:"2-3 days", price:26.9},
-            {carrier:"UPS Standard", eta:"4-6 days", price:16.9} ],
-    intl: [ {carrier:"DHL Express Worldwide", eta:"4-8 days", price:34.9},
-            {carrier:"UPS Worldwide", eta:"5-9 days", price:32.9} ]
-  };
-  return TABLE[zone] || TABLE.es;
-}
 
 function renderShippingOptions(options){
   const wrap = document.getElementById("shippingOptions");
@@ -1064,10 +1056,10 @@ function renderShippingOptions(options){
     <label class="ship-option" data-i="${i}">
       <input type="radio" name="shipOpt" value="${i}">
       <div>
-        <div class="ship-option-name">${o.carrier}</div>
-        <div class="ship-option-eta">${o.eta}</div>
+        <div class="ship-option-name">${o.carrier} — ${o.service}</div>
+        <div class="ship-option-eta">${o.estimated_days ? o.estimated_days + " days" : "ETA varies"}</div>
       </div>
-      <div class="ship-option-price">${o.price===0 ? "Free" : fmt(o.price)}</div>
+      <div class="ship-option-price">${fmt(o.amount)}</div>
     </label>
   `).join("");
   wrap.querySelectorAll(".ship-option").forEach((el, i)=>{
@@ -1085,64 +1077,133 @@ function renderShippingOptions(options){
 function updateSummary(){
   document.getElementById("orderSummary").style.display = "block";
   document.getElementById("sumProducts").textContent = fmt(cartTotal());
-  document.getElementById("sumShipping").textContent = selectedShipping
-    ? (selectedShipping.price===0 ? "Free" : fmt(selectedShipping.price))
-    : "—";
-  const shipPrice = selectedShipping ? selectedShipping.price : 0;
+  document.getElementById("sumShipping").textContent = selectedShipping ? fmt(selectedShipping.amount) : "—";
+  const shipPrice = selectedShipping ? selectedShipping.amount : 0;
   document.getElementById("sumTotal").textContent = fmt(cartTotal() + shipPrice);
 }
 
-document.getElementById("calcShipping").addEventListener("click", ()=>{
+function cartItemsPayload(){
+  return Object.values(cart).map(l => ({
+    id: l.product.id, name: l.product.name, en: l.product.en,
+    size: l.product.size, price: l.product.price, qty: l.qty
+  }));
+}
+
+document.getElementById("calcShipping").addEventListener("click", async ()=>{
   const okAddress = validateField("fAddress","errAddress", v=>v.length>3);
   const okPostal = validateField("fPostal","errPostal", v=>v.length>=3);
   const okCity = validateField("fCity","errCity", v=>v.length>1);
-  const okCountry = validateField("fCountry","errCountry", v=>v.length>1);
-  if(!(okAddress && okPostal && okCity && okCountry)) return;
+  const country = document.getElementById("fCountry").value;
+  const okCountry = validateField("fCountry","errCountry", v=>v.length===2 && v!=="OTHER" ? true : v.length>0);
+  if(!(okAddress && okPostal && okCity) || country==="") return;
 
-  const country = document.getElementById("fCountry").value.trim();
-  const postal = document.getElementById("fPostal").value.trim();
-  const zone = shippingZone(country, postal);
-  const options = getShippingOptions(zone);
-  selectedShipping = null;
-  document.getElementById("shippingBlock").style.display = "block";
-  renderShippingOptions(options);
-  updateSummary();
+  if(country === "OTHER"){
+    document.getElementById("errCountry").textContent = "For destinations outside this list, please message us on WhatsApp so we can quote it manually.";
+    document.getElementById("errCountry").style.display = "block";
+    return;
+  }
+
+  const btn = document.getElementById("calcShipping");
+  const orderStatus = document.getElementById("orderStatus");
+  btn.disabled = true; btn.textContent = "Getting live rates...";
+  orderStatus.textContent = "";
+
+  try{
+    const res = await fetch(`${API_BASE_URL}/api/rates`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        address: {
+          name: document.getElementById("fName").value.trim() || "Customer",
+          street1: document.getElementById("fAddress").value.trim(),
+          city: document.getElementById("fCity").value.trim(),
+          zip: document.getElementById("fPostal").value.trim(),
+          country: country,
+          phone: document.getElementById("fPhone").value.trim(),
+          email: document.getElementById("fEmail").value.trim()
+        },
+        items: cartItemsPayload()
+      })
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || "Could not get shipping rates.");
+    if(!data.rates || data.rates.length === 0){
+      orderStatus.style.color = "var(--gold)";
+      orderStatus.textContent = data.warning || "No live carrier rates available for this address yet.";
+      document.getElementById("shippingBlock").style.display = "none";
+      return;
+    }
+    selectedShipping = null;
+    document.getElementById("shippingBlock").style.display = "block";
+    renderShippingOptions(data.rates);
+    updateSummary();
+  }catch(err){
+    orderStatus.style.color = "var(--red)";
+    orderStatus.textContent = "Couldn't reach the shipping backend: " + err.message;
+  }finally{
+    btn.disabled = false; btn.textContent = "Get shipping rates";
+  }
 });
 
-document.getElementById("sendOrder").addEventListener("click", ()=>{
+document.getElementById("sendOrder").addEventListener("click", async ()=>{
   const okName = validateField("fName","errName", v=>v.length>1);
   const okPhone = validateField("fPhone","errPhone", v=>v.length>5);
+  const okEmail = validateField("fEmail","errEmail", v=>v.length===0 || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v));
   const okAddress = validateField("fAddress","errAddress", v=>v.length>3);
   const okPostal = validateField("fPostal","errPostal", v=>v.length>=3);
   const okCity = validateField("fCity","errCity", v=>v.length>1);
-  const okCountry = validateField("fCountry","errCountry", v=>v.length>1);
+  const okCountry = validateField("fCountry","errCountry", v=>v.length>0);
   const errShipping = document.getElementById("errShipping");
   const okShipping = !!selectedShipping;
   errShipping.style.display = okShipping ? "none" : "block";
-  if(!(okName && okPhone && okAddress && okPostal && okCity && okCountry && okShipping)) return;
+  if(!(okName && okPhone && okEmail && okAddress && okPostal && okCity && okCountry && okShipping)) return;
 
-  const name = document.getElementById("fName").value.trim();
-  const phone = document.getElementById("fPhone").value.trim();
-  const address = document.getElementById("fAddress").value.trim();
-  const postal = document.getElementById("fPostal").value.trim();
-  const city = document.getElementById("fCity").value.trim();
-  const country = document.getElementById("fCountry").value.trim();
-  const notes = document.getElementById("fNotes").value.trim();
+  const orderStatus = document.getElementById("orderStatus");
+  const sendBtn = document.getElementById("sendOrder");
+  sendBtn.disabled = true; sendBtn.textContent = "Placing order...";
+  orderStatus.textContent = "";
 
-  const lines = Object.values(cart);
-  let msg = "Hi, I'd like to place an order:\n\n";
-  lines.forEach(l=>{
-    msg += `- ${l.product.name} / ${l.product.en} (${l.product.size}) x${l.qty} = ${fmt(l.product.price*l.qty)}\n`;
-  });
-  msg += `\nProducts: ${fmt(cartTotal())}\n`;
-  msg += `Shipping (${selectedShipping.carrier}, ${selectedShipping.eta}): ${selectedShipping.price===0?"Free":fmt(selectedShipping.price)}\n`;
-  msg += `Total: ${fmt(cartTotal() + selectedShipping.price)}\n\n`;
-  msg += `Name: ${name}\nPhone: ${phone}\nAddress: ${address}\nPostal code: ${postal}\nCity: ${city}\nCountry: ${country}\n`;
-  if(notes) msg += `Notes: ${notes}\n`;
+  try{
+    const res = await fetch(`${API_BASE_URL}/api/orders`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        customer: {
+          name: document.getElementById("fName").value.trim(),
+          phone: document.getElementById("fPhone").value.trim(),
+          email: document.getElementById("fEmail").value.trim()
+        },
+        address: {
+          street1: document.getElementById("fAddress").value.trim(),
+          city: document.getElementById("fCity").value.trim(),
+          zip: document.getElementById("fPostal").value.trim(),
+          country: document.getElementById("fCountry").value
+        },
+        items: cartItemsPayload(),
+        shipping: {
+          rate_id: selectedShipping.rate_id,
+          carrier: selectedShipping.carrier,
+          service: selectedShipping.service,
+          amount: selectedShipping.amount,
+          currency: selectedShipping.currency
+        },
+        notes: document.getElementById("fNotes").value.trim()
+      })
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || "Could not place the order.");
 
-  const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
-  window.open(url, "_blank", "noopener");
-  closeModal();
+    orderStatus.style.color = "var(--green)";
+    orderStatus.textContent = `Order placed! Your order number is ${data.order_id}. We'll email you to confirm payment.`;
+    Object.keys(cart).forEach(k => delete cart[k]);
+    renderCatalog(); renderCart();
+    setTimeout(closeModal, 3500);
+  }catch(err){
+    orderStatus.style.color = "var(--red)";
+    orderStatus.textContent = "Couldn't place the order: " + err.message;
+  }finally{
+    sendBtn.disabled = false; sendBtn.textContent = "Confirm order";
+  }
 });
 
 renderCatButtons();
