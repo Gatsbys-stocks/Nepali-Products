@@ -793,6 +793,10 @@ const I18N = {
     orderErrorDefault: "Could not place the order.",
     orderErrorPrefix: "Couldn't place the order: ",
     orderSuccess: (id) => `Order placed! Your order number is ${id}. We'll email you to confirm payment.`,
+    redirectingToPayment: "Order placed — taking you to secure payment...",
+    paymentRedirectError: "Order placed, but we couldn't open the payment page: ",
+    paymentSuccessBanner: (id) => `Payment received — thank you! Your order number is ${id}.`,
+    paymentCancelledBanner: (id) => `Payment was cancelled for order ${id}. You can try again from your cart, or contact us on WhatsApp.`,
     etaVaries: "ETA varies",
     daysSuffix: " days",
     productWord: (n) => n===1 ? "product" : "products"
@@ -860,6 +864,10 @@ const I18N = {
     orderErrorDefault: "अर्डर राख्न सकिएन।",
     orderErrorPrefix: "अर्डर राख्न सकिएन: ",
     orderSuccess: (id) => `अर्डर राखियो! तपाईंको अर्डर नम्बर ${id} हो। भुक्तानी पुष्टि गर्न हामी तपाईंलाई इमेल गर्नेछौं।`,
+    redirectingToPayment: "अर्डर राखियो — भुक्तानी पृष्ठमा लैजाँदै...",
+    paymentRedirectError: "अर्डर राखियो, तर भुक्तानी पृष्ठ खोल्न सकिएन: ",
+    paymentSuccessBanner: (id) => `भुक्तानी प्राप्त भयो — धन्यवाद! तपाईंको अर्डर नम्बर ${id} हो।`,
+    paymentCancelledBanner: (id) => `अर्डर ${id} को भुक्तानी रद्द भयो। तपाईं कार्टबाट फेरि प्रयास गर्न सक्नुहुन्छ, वा ह्वाट्सएपमा हामीलाई सम्पर्क गर्नुहोस्।`,
     etaVaries: "समय फरक हुन सक्छ",
     daysSuffix: " दिन",
     productWord: () => "उत्पादन"
@@ -1397,14 +1405,19 @@ document.getElementById("sendOrder").addEventListener("click", async ()=>{
     const data = await res.json();
     if(!res.ok) throw new Error(data.error || t("orderErrorDefault"));
 
-    orderStatus.style.color = "var(--green)";
-    orderStatus.textContent = t("orderSuccess")(data.order_id);
     Object.keys(cart).forEach(k => delete cart[k]);
     renderCatalog(); renderCart();
-    setTimeout(closeModal, 3500);
+
+    orderStatus.style.color = "var(--green)";
+    orderStatus.textContent = t("redirectingToPayment");
+
+    const payRes = await fetch(`${API_BASE_URL}/api/orders/${data.order_id}/checkout`, { method: "POST" });
+    const payData = await payRes.json();
+    if(!payRes.ok || !payData.checkout_url) throw new Error(payData.error || "");
+    window.location.href = payData.checkout_url;
   }catch(err){
     orderStatus.style.color = "var(--red)";
-    orderStatus.textContent = t("orderErrorPrefix") + err.message;
+    orderStatus.textContent = t("paymentRedirectError") + err.message;
   }finally{
     sendBtn.disabled = false; sendBtn.textContent = t("confirmBtn");
   }
@@ -1480,6 +1493,24 @@ renderCatButtons();
 renderCatalog();
 renderCart();
 applyI18n();
+
+/* ---------- Stripe redirect result banner ---------- */
+(function showPaymentResultBanner(){
+  const params = new URLSearchParams(window.location.search);
+  const payment = params.get("payment");
+  const orderId = params.get("order");
+  if(!payment || !orderId) return;
+
+  const banner = document.createElement("div");
+  banner.style.cssText = "max-width:1080px;margin:14px auto 0;padding:0 20px;";
+  const msg = payment === "success" ? t("paymentSuccessBanner")(orderId) : t("paymentCancelledBanner")(orderId);
+  const color = payment === "success" ? "var(--green)" : "var(--gold)";
+  banner.innerHTML = `<div style="border:1px solid ${color};color:${color};border-radius:12px;padding:12px 16px;font-size:13.5px;">${msg}</div>`;
+  document.querySelector("header").insertAdjacentElement("afterend", banner);
+
+  // Clean the URL so refreshing doesn't re-show the banner.
+  window.history.replaceState({}, "", window.location.pathname);
+})();
 </script>
 </body>
 </html>
