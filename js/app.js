@@ -720,52 +720,67 @@ document.getElementById("sendOrder").addEventListener("click", async ()=>{
   }
 });
 
+function setText(id, value){
+  const el = document.getElementById(id);
+  if(el) el.textContent = value;
+}
+function setHTML(id, value){
+  const el = document.getElementById(id);
+  if(el) el.innerHTML = value;
+}
+function setPlaceholder(id, value){
+  const el = document.getElementById(id);
+  if(el) el.placeholder = value;
+}
+function setAria(id, value){
+  const el = document.getElementById(id);
+  if(el) el.setAttribute("aria-label", value);
+}
+
 function applyI18n(){
   document.documentElement.lang = lang;
-  document.getElementById("eyebrowText").textContent = t("eyebrowText");
-  document.getElementById("heroSub").textContent = t("heroSub");
-  document.getElementById("shopLabel").textContent = t("shopLabel");
-  document.getElementById("whatsappLabel").textContent = t("whatsappLabel");
-  document.getElementById("waBtnText").textContent = t("waBtnText");
-  document.getElementById("searchInput").placeholder = t("searchPlaceholder");
-  document.getElementById("noteStrip").innerHTML = t("noteStrip");
-  document.getElementById("footerText").textContent = t("footerText");
-  document.getElementById("cartFabLabel").textContent = t("cartFabLabel");
-  document.getElementById("cartFab").setAttribute("aria-label", t("openCartAria"));
-  document.getElementById("drawerClose").setAttribute("aria-label", t("closeCartAria"));
-  document.getElementById("drawer").setAttribute("aria-label", t("shoppingCartAria"));
-  document.getElementById("drawerTitle").textContent = t("drawerTitle");
-  document.getElementById("drawerTotalLabel").textContent = t("drawerTotalLabel");
-  document.getElementById("openCheckout").textContent = t("continueOrder");
-  document.getElementById("modalTitle").textContent = t("modalTitle");
-  document.getElementById("modalHint").textContent = t("modalHint");
-  document.getElementById("labelName").textContent = t("labelName");
-  document.getElementById("errName").textContent = t("errName");
-  document.getElementById("labelPhone").textContent = t("labelPhone");
-  document.getElementById("errPhone").textContent = t("errPhone");
-  document.getElementById("labelEmail").textContent = t("labelEmail");
-  document.getElementById("errEmail").textContent = t("errEmail");
-  document.getElementById("labelAddress").textContent = t("labelAddress");
-  document.getElementById("errAddress").textContent = t("errAddress");
-  document.getElementById("labelFloor").textContent = t("labelFloor");
-  document.getElementById("labelDoor").textContent = t("labelDoor");
-  document.getElementById("labelPostal").textContent = t("labelPostal");
-  document.getElementById("errPostal").textContent = t("errPostal");
-  document.getElementById("labelCity").textContent = t("labelCity");
-  document.getElementById("errCity").textContent = t("errCity");
-  document.getElementById("labelCountry").textContent = t("labelCountry");
-  document.getElementById("errCountry").textContent = t("errCountry");
-  document.getElementById("calcShipping").textContent = t("getRatesBtn");
-  document.getElementById("labelCarrier").textContent = t("labelCarrier");
-  document.getElementById("errShipping").textContent = t("errShipping");
-  document.getElementById("shipNote").textContent = t("shipNote");
-  document.getElementById("labelNotes").textContent = t("labelNotes");
-  document.getElementById("fNotes").placeholder = t("notesPlaceholder");
-  document.getElementById("sumProductsLabel").textContent = t("sumProductsLabel");
-  document.getElementById("sumShippingLabel").textContent = t("sumShippingLabel");
-  document.getElementById("sumTotalLabel").textContent = t("sumTotalLabel");
-  document.getElementById("cancelCheckout").textContent = t("cancelBtn");
-  document.getElementById("sendOrder").textContent = t("confirmBtn");
+  setText("eyebrowText", t("eyebrowText"));
+  setText("heroSub", t("heroSub"));
+  setText("waBtnText", t("waBtnText"));
+  setPlaceholder("searchInput", t("searchPlaceholder"));
+  setHTML("noteStrip", t("noteStrip"));
+  setText("footerText", t("footerText"));
+  setText("cartFabLabel", t("cartFabLabel"));
+  setAria("cartFab", t("openCartAria"));
+  setAria("drawerClose", t("closeCartAria"));
+  setAria("drawer", t("shoppingCartAria"));
+  setText("drawerTitle", t("drawerTitle"));
+  setText("drawerTotalLabel", t("drawerTotalLabel"));
+  setText("openCheckout", t("continueOrder"));
+  setText("modalTitle", t("modalTitle"));
+  setText("modalHint", t("modalHint"));
+  setText("labelName", t("labelName"));
+  setText("errName", t("errName"));
+  setText("labelPhone", t("labelPhone"));
+  setText("errPhone", t("errPhone"));
+  setText("labelEmail", t("labelEmail"));
+  setText("errEmail", t("errEmail"));
+  setText("labelAddress", t("labelAddress"));
+  setText("errAddress", t("errAddress"));
+  setText("labelFloor", t("labelFloor"));
+  setText("labelDoor", t("labelDoor"));
+  setText("labelPostal", t("labelPostal"));
+  setText("errPostal", t("errPostal"));
+  setText("labelCity", t("labelCity"));
+  setText("errCity", t("errCity"));
+  setText("labelCountry", t("labelCountry"));
+  setText("errCountry", t("errCountry"));
+  setText("calcShipping", t("getRatesBtn"));
+  setText("labelCarrier", t("labelCarrier"));
+  setText("errShipping", t("errShipping"));
+  setText("shipNote", t("shipNote"));
+  setText("labelNotes", t("labelNotes"));
+  setPlaceholder("fNotes", t("notesPlaceholder"));
+  setText("sumProductsLabel", t("sumProductsLabel"));
+  setText("sumShippingLabel", t("sumShippingLabel"));
+  setText("sumTotalLabel", t("sumTotalLabel"));
+  setText("cancelCheckout", t("cancelBtn"));
+  setText("sendOrder", t("confirmBtn"));
   renderCatButtons();
   renderCatalog();
   renderCart();
@@ -787,11 +802,17 @@ document.getElementById("langNpBtn").addEventListener("click", ()=>{
 });
 
 // Primer render con el catálogo de respaldo, para no dejar la página en
-// blanco mientras llega la respuesta del backend.
-renderCatButtons();
-renderCatalog();
-renderCart();
-applyI18n();
+// blanco mientras llega la respuesta del backend. Lo envuelvo en try/catch
+// para que, si algo inesperado falla aquí, no impida que loadProducts()
+// se llegue a ejecutar más abajo (es justo lo que nos pasó con "shopLabel").
+try{
+  renderCatButtons();
+  renderCatalog();
+  renderCart();
+  applyI18n();
+}catch(e){
+  console.error("Error en el primer render, se intenta seguir igualmente.", e);
+}
 
 // En cuanto llega el catálogo real del backend, se vuelve a pintar.
 loadProducts().then(()=>{
