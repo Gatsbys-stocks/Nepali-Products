@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 400" role="img" aria-label="Productos desi: arroz basmati, harina, achar, noodles, especias, té y lentejas">
+  <defs>
+    <filter id="sh" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#152350" flood-opacity=".22"/>
+    </filter>
+    <linearGradient id="jute" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e2c58f"/><stop offset="1" stop-color="#c6a162"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b3261a"/><stop offset=".35" stop-color="#e0492c"/><stop offset="1" stop-color="#9a2014"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- estante -->
+  <rect x="10" y="352" width="440" height="16" rx="4" fill="#003893"/>
+  <rect x="10" y="366" width="440" height="6" rx="3" fill="#dc143c"/>
+  <ellipse cx="230" cy="386" rx="200" ry="8" fill="#152350" opacity=".08"/>
+
+  <!-- saco de basmati (yute) -->
+  <g filter="url(#sh)">
+    <path d="M40 352 L32 150 q0 -18 18 -22 l8 -20 q34 -12 70 0 l8 20 q18 4 18 22 L146 352z" fill="url(#jute)"/>
+    <path d="M58 108 q34 -14 70 0 q-8 10 -35 10 q-27 0 -35 -10z" fill="#b8924f"/>
+    <path d="M60 114 q32 10 66 0" stroke="#8a6a32" stroke-width="3" fill="none"/>
+    <g stroke="#c9a867" stroke-width="1.2" opacity=".6">
+      <path d="M40 180 h104"/><path d="M40 200 h104"/><path d="M40 300 h104"/><path d="M40 320 h104"/>
+    </g>
+    <rect x="46" y="212" width="94" height="76" rx="6" fill="#fffaf0"/>
+    <rect x="46" y="212" width="94" height="16" rx="6" fill="#003893"/>
+    <text x="93" y="224.5" text-anchor="middle" font-family="Work Sans,Arial,sans-serif" font-size="10" font-weight="700" fill="#fff" letter-spacing="1.5">BASMATI</text>
+    <text x="93" y="252" text-anchor="middle" font-family="Noto Serif Devanagari,serif" font-size="17" font-weight="700" fill="#dc143c">चामल</text>
+    <text x="93" y="274" text-anchor="middle" font-family="Work Sans,Arial,sans-serif" font-size="11" font-weight="600" fill="#152350">5 kg</text>
+    <!-- granos derramados -->
+    <g fill="#fffdf6" stroke="#e7dfc9" stroke-width=".6">
+      <ellipse cx="160" cy="348" rx="5" ry="2"/><ellipse cx="170" cy="345" rx="5" ry="2" transform="rotate(30 170 345)"/><ellipse cx="152" cy="344" rx="5" ry="2" transform="rotate(-25 152 344)"/>
+    </g>
+  </g>
+
+  <!-- bolsa de atta -->
+  <g filter="url(#sh)">
+    <path d="M150 352 L156 176 l6 -10 h76 l6 10 L250 352z" fill="#f6efe0"/>
+    <path d="M162 166 l4 -10 h68 l4 10z" fill="#e4d8bd"/>
+    <rect x="156" y="190" width="94" height="72" fill="#dc143c"/>
+    <path d="M156 262 q47 18 94 0 v14 q-47 18 -94 0z" fill="#b3102f"/>
+    <text x="203" y="214" text-anchor="middle" font-family="Work Sans,Arial,sans-serif" font-size="11" font-weight="700" fill="#fff" letter-spacing="2">CHAKKI</text>
+    <text x="203" y="248" text-anchor="middle" font-family="Noto Serif Devanagari,serif" font-size="24" font-weight="700" fill="#fff">आटा</text>
+    <!-- espigas de trigo -->
+    <g stroke="#c27c0e" stroke-width="2" fill="#e9b04a">
+      <path d="M190 330 v-36" fill="none"/><ellipse cx="190" cy="298" rx="3" ry="6"/><ellipse cx="185" cy="306" rx="3" ry="6" transform="rotate(-25 185 306)"/><ellipse cx="195" cy="306" rx="3" ry="6" transform="rotate(25 195 306)"/>
+      <path d="M216 330 v-30" fill="none"/><ellipse cx="216" cy="304" rx="3" ry="6"/><ellipse cx="211" cy="312" rx="3" ry="6" transform="rotate(-25 211 312)"/><ellipse cx="221" cy="312" rx="3" ry="6" transform="rotate(25 221 312)"/>
+    </g>
+    <text x="203" y="344" text-anchor="middle" font-family="Work Sans,Arial,sans-serif" font-size="11" font-weight="600" fill="#152350">5 kg</text>
+  </g>
+
+  <!-- bote de achar -->
+  <g filter="url(#sh)">
+    <rect x="262" y="212" width="74" height="140" rx="14" fill="url(#glass)"/>
+    <rect x="266" y="194" width="66" height="22" rx="5" fill="#003893"/>
+    <rect x="266" y="194" width="66" height="6" rx="3" fill="#2a5cb3"/>
+    <rect x="270" y="252" width="58" height="56" rx="6" fill="#fffaf0"/>
+    <text x="299" y="282" text-anchor="middle" font-family="Noto Serif Devanagari,serif" font-size="20" font-weight="700" fill="#dc143c">अचार</text>
+    <text x="299" y="299" text-anchor="middle" font-family="Work Sans,Arial,sans-serif" font-size="9" font-weight="700" fill="#152350" letter-spacing="1">MIXED</text>
+    <rect x="272" y="220" width="10" height="120" rx="5" fill="url(#shine)"/>
+    <g fill="#f08a3e"><rect x="300" y="226" width="9" height="9" rx="2" transform="rotate(18 304 230)"/><rect x="314" y="318" width="9" height="9" rx="2" transform="rotate(-12 318 322)"/><rect x="284" y="320" width="8" height="8" rx="2"/></g>
+  </g>
+
+  <!-- paquetes de noodles apilados -->
+  <g filter="url(#sh)">
+    <g transform="rotate(-6 390 320)">
+      <rect x="344" y="300" width="96" height="44" rx="6" fill="#f0b429"/>
+      <path d="M344 306 l6 -4 v44 l-6 -4z M440 306 l-6 -4 v44 l6 -4z" fill="#d49a13"/>
+      <text x="392" y="321" text-anchor="middle" font-family="Work Sans,Arial,sans-serif" font-size="10" font-weight="800" fill="#b3102f" letter-spacing="1">NOODLES</text>
+      <text x="392" y="336" text-anchor="middle" font-family="Noto Serif Devanagari,serif" font-size="12" font-weight="700" fill="#152350">चाउचाउ</text>
+    </g>
+    <g transform="rotate(4 392 276)">
+      <rect x="348" y="256" width="92" height="42" rx="6" fill="#dc143c"/>
+      <path d="M348 262 l6 -4 v42 l-6 -4z M440 262 l-6 -4 v42 l6 -4z" fill="#b3102f"/>
+      <text x="394" y="276" text-anchor="middle" font-family="Work Sans,Arial,sans-serif" font-size="10" font-weight="800" fill="#fff" letter-spacing="1">SPICY</text>
+      <text x="394" y="291" text-anchor="middle" font-family="Noto Serif Devanagari,serif" font-size="12" font-weight="700" fill="#ffe7a8">चाउचाउ</text>
+    </g>
+    <g transform="rotate(-3 390 232)">
+      <rect x="350" y="214" width="86" height="40" rx="6" fill="#2e9a5b"/>
+      <path d="M350 220 l6 -4 v40 l-6 -4z M436 220 l-6 -4 v40 l6 -4z" fill="#237a47"/>
+      <text x="393" y="233" text-anchor="middle" font-family="Work Sans,Arial,sans-serif" font-size="10" font-weight="800" fill="#fff" letter-spacing="1">VEG</text>
+      <text x="393" y="247" text-anchor="middle" font-family="Noto Serif Devanagari,serif" font-size="11" font-weight="700" fill="#fff">चाउचाउ</text>
+    </g>
+  </g>
+
+  <!-- caja de té (fila de atrás, arriba) -->
+  <g filter="url(#sh)">
+    <rect x="276" y="96" width="70" height="92" rx="4" fill="#1f6b43"/>
+    <rect x="276" y="96" width="70" height="14" rx="4" fill="#15512f"/>
+    <circle cx="311" cy="140" r="20" fill="#f6efe0"/>
+    <path d="M300 146 q11 -26 22 -10 q-6 14 -22 10z" fill="#2e9a5b"/>
+    <path d="M300 146 q10 -8 20 -12" stroke="#1f6b43" stroke-width="1.5" fill="none"/>
+    <text x="311" y="177" text-anchor="middle" font-family="Noto Serif Devanagari,serif" font-size="15" font-weight="700" fill="#f0c36e">चिया</text>
+  </g>
+
+  <!-- botes de masala -->
+  <g filter="url(#sh)">
+    <g transform="translate(362 120)">
+      <rect x="0" y="16" width="40" height="62" rx="6" fill="#fffaf0"/>
+      <rect x="-2" y="6" width="44" height="14" rx="4" fill="#c27c0e"/>
+      <rect x="4" y="40" width="32" height="26" rx="3" fill="#e9a825"/>
+      <text x="20" y="58" text-anchor="middle" font-family="Noto Serif Devanagari,serif" font-size="10" font-weight="700" fill="#fff">बेसार</text>
+    </g>
+    <g transform="translate(408 128)">
+      <rect x="0" y="16" width="38" height="54" rx="6" fill="#fffaf0"/>
+      <rect x="-2" y="6" width="42" height="14" rx="4" fill="#9c3a14"/>
+      <rect x="4" y="36" width="30" height="24" rx="3" fill="#b8481c"/>
+      <text x="19" y="53" text-anchor="middle" font-family="Noto Serif Devanagari,serif" font-size="10" font-weight="700" fill="#fff">मसला</text>
+    </g>
+  </g>
+
+  <!-- bolsa de dal (fila de atrás, izquierda) -->
+  <g filter="url(#sh)">
+    <path d="M170 150 q-6 -30 8 -52 h54 q14 22 8 52z" fill="#fbe9c2" opacity=".96"/>
+    <path d="M178 98 h54 l-4 -10 h-46z" fill="#e0c07c"/>
+    <g fill="#e79a2a">
+      <circle cx="190" cy="112" r="3"/><circle cx="198" cy="120" r="3"/><circle cx="206" cy="110" r="3"/><circle cx="214" cy="122" r="3"/><circle cx="222" cy="114" r="3"/>
+      <circle cx="186" cy="128" r="3"/><circle cx="226" cy="130" r="3"/><circle cx="204" cy="132" r="3"/>
+    </g>
+    <rect x="182" y="134" width="46" height="14" rx="3" fill="#003893"/>
+    <text x="205" y="145" text-anchor="middle" font-family="Noto Serif Devanagari,serif" font-size="10" font-weight="700" fill="#fff">दाल</text>
+  </g>
+
+  <!-- chiles y anís estrellado sueltos -->
+  <path d="M100 96 q24 -22 18 -60 q-4 -5 -8 0 q2 34 -16 54z" fill="#dc143c" filter="url(#sh)"/>
+  <path d="M112 38 q2 -10 10 -12" stroke="#2e9a5b" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M40 60 l6 14 14 2 -10 10 3 14 -13 -7 -13 7 3 -14 -10 -10 14 -2z" fill="#8a5a2b" opacity=".9"/>
+  <g fill="#6b3b12"><ellipse cx="248" cy="70" rx="5" ry="3"/><ellipse cx="260" cy="78" rx="5" ry="3" transform="rotate(30 260 78)"/><ellipse cx="244" cy="84" rx="5" ry="3" transform="rotate(-20 244 84)"/></g>
+</svg>
